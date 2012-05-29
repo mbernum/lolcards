@@ -1,5 +1,6 @@
 MAX_DECK_SIZE = 50
 
+
 class Card(object):
 
     def __init__(self):
