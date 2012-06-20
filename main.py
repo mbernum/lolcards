@@ -2,6 +2,7 @@ from card import Card, MainDeck, ResourceDeck, UsedDeck
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
+STARTING_RESOURCES = 3
 
 
 class Player(object):
@@ -49,8 +50,15 @@ class Player(object):
         self.receive_card(card_gathered)
 
 
-def opening_phase():
-    pass
+def opening_phase(current_player):
+    '''
+    Gameplay starts with players moving some cards to their resource deck.
+    Other miscellaneous events may occur here before moving on to the next
+    phase of the game.
+    '''
+    for x in xrange(STARTING_RESOURCES):
+        current_player.main_deck.move_card_to_deck(
+            current_player.resource_deck)
 
 
 def deploy_phase():
