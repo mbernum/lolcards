@@ -8,32 +8,45 @@ class Player(object):
     def __init__(self, name):
         self.name = name
         self.hand = []
-        self.main_deck = None
-        self.resource_deck = None
-        self.used_deck = None
+
+        main_deck, resource_deck, used_deck = self.start_decks()
+        self.main_deck = main_deck
+        self.resource_deck = resource_deck
+        self.used_deck = used_deck
 
     def __repr__(self):
         return "<Player name:%s hand:%s>" % (self.name,
                                              self.hand)
 
-    def get_card(self, card):
+    def start_decks(self):
+        '''
+        Initialize decks for player. Player will have their normal resource
+        deck. Other decks are started but empty.
+        '''
+        main_deck = MainDeck()
+        resource_deck = ResourceDeck()
+        used_deck = UsedDeck()
+        for opening_card in xrange(main_deck.start_size):
+            card = get_random_card()
+            main_deck.add_card(card)
+        return main_deck, resource_deck, used_deck
+
+    def receive_card(self, card):
+        '''
+        Receive a card and add it to a players hand.
+        '''
         self.hand.append(card)
 
-    def get_deck(self, deck, deck_type):
-        if deck_type == 'main':
-            self.main_deck = deck
-        elif deck_type == 'resource':
-            self.resource_deck = deck
-        elif deck_type == 'used':
-            self.used_deck = deck
-
     def draw_to_hand(self, deck_type='resource'):
+        '''
+        Take a card from a deck and add it to a players hand
+        '''
         if deck_type == 'main':
             card_gathered = self.main_deck.cards_in_deck.pop()
         elif deck_type == 'resource':
             card_gathered = self.resource_deck.cards_in_deck.pop()
 
-        self.get_card(card_gathered)
+        self.receive_card(card_gathered)
 
 
 def opening_phase():
@@ -61,25 +74,9 @@ def get_random_card():
     return card
 
 
-def start_decks():
-    main_deck = MainDeck()
-    resource_deck = ResourceDeck()
-    used_deck = UsedDeck()
-    for opening_card in xrange(main_deck.start_size):
-        card = get_random_card()
-        main_deck.get_card(card)
-    return main_deck, resource_deck, used_deck
-
-
 def start_game(players):
     for player in players:
-        starting_deck, resource_deck, used_deck = start_decks()
-        player.get_deck(starting_deck, 'main')
-        player.get_deck(resource_deck, 'resource')
-        player.get_deck(used_deck, 'used')
-
         for x in xrange(START_HAND_SIZE):
-            #start_card = get_random_card()
             player.draw_to_hand('main')
 
 

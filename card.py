@@ -27,7 +27,10 @@ class Deck(object):
     def __repr__(self):
         return "<Deck #cards:%s>" % len(self.cards_in_deck)
 
-    def get_card(self, card):
+    def add_card(self, card):
+        '''
+        Add a card to the deck.
+        '''
         self.cards_in_deck.append(card)
 
 
