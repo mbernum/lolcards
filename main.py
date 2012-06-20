@@ -1,4 +1,4 @@
-from card import Card, MainDeck
+from card import Card, MainDeck, ResourceDeck, UsedDeck
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
@@ -11,6 +11,10 @@ class Player(object):
         self.main_deck = None
         self.resource_deck = None
         self.used_deck = None
+
+    def __repr__(self):
+        return "<Player name:%s hand:%s>" % (self.name,
+                                             self.hand)
 
     def get_card(self, card):
         self.hand.append(card)
@@ -57,18 +61,22 @@ def get_random_card():
     return card
 
 
-def start_deck():
-    deck = MainDeck()
-    for opening_card in xrange(deck.start_size):
+def start_decks():
+    main_deck = MainDeck()
+    resource_deck = ResourceDeck()
+    used_deck = UsedDeck()
+    for opening_card in xrange(main_deck.start_size):
         card = get_random_card()
-        deck.get_card(card)
-    return deck
+        main_deck.get_card(card)
+    return main_deck, resource_deck, used_deck
 
 
 def start_game(players):
     for player in players:
-        starting_deck = start_deck()
+        starting_deck, resource_deck, used_deck = start_decks()
         player.get_deck(starting_deck, 'main')
+        player.get_deck(resource_deck, 'resource')
+        player.get_deck(used_deck, 'used')
 
         for x in xrange(START_HAND_SIZE):
             #start_card = get_random_card()
@@ -82,6 +90,7 @@ def main():
     start_game(players)
 
     for game_round in xrange(TEST_ROUNDS):
+        import pdb; pdb.set_trace()
         opening_phase()
         deploy_phase()
         move_phase()
