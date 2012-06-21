@@ -1,3 +1,5 @@
+from random import randrange
+
 MAX_DECK_SIZE = 50
 
 
@@ -40,6 +42,15 @@ class Deck(object):
         '''
         card_gathered = self.cards_in_deck.pop()
         deck.add_card(card_gathered)
+
+    def randomize_cards(self):
+        '''
+        For testing, randomize cards. Give random names and
+        other needed stats for the cards.
+        '''
+        for x in self.cards_in_deck:
+            x.name = 'Card %x' % randrange(10000, 99999)
+            x.cost = randrange(0, 10)
 
 
 class MainDeck(Deck):

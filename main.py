@@ -49,6 +49,13 @@ class Player(object):
 
         self.receive_card(card_gathered)
 
+    def randomize_decks(self):
+        '''
+        For testing, randomize players decks.
+        '''
+        for d in (self.main_deck, self.resource_deck, self.used_deck):
+            d.randomize_cards()
+
 
 def opening_phase(current_player):
     '''
@@ -86,6 +93,7 @@ def start_game(players):
     for player in players:
         for x in xrange(START_HAND_SIZE):
             player.draw_to_hand('main')
+        player.randomize_decks()
 
 
 def main():
@@ -96,11 +104,12 @@ def main():
 
     for game_round in xrange(TEST_ROUNDS):
         import pdb; pdb.set_trace()
-        opening_phase()
-        deploy_phase()
-        move_phase()
-        attack_phase()
-        end_phase()
+        for current_player in players:
+            opening_phase(current_player)
+            deploy_phase()
+            move_phase()
+            attack_phase()
+            end_phase()
 
 if __name__ == '__main__':
     main()
