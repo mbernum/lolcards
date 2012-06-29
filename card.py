@@ -9,11 +9,19 @@ class Card(object):
         self.name = None
         self.card_type = None
         self.cost = None
+        self.card_id = None
 
     def __repr__(self):
-        return "<Card name:%s type:%s cost:%s>" % (self.name,
-                                                   self.card_type,
-                                                   self.cost)
+        return "<Card id: %s name:%s type:%s cost:%s>" % (self.card_id,
+                                                          self.name,
+                                                          self.card_type,
+                                                          self.cost)
+
+    def get_id(self, card_id):
+        '''
+        Deck will inform us which number card it is in the deck.
+        '''
+        self.card_id = card_id
 
 
 class Deck(object):
@@ -34,6 +42,7 @@ class Deck(object):
         Add a card to the deck.
         '''
         self.cards_in_deck.append(card)
+        card.get_id(len(self.cards_in_deck))
 
     def move_card_to_deck(self, deck):
         '''

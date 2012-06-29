@@ -57,59 +57,56 @@ class Player(object):
             d.randomize_cards()
 
 
-def opening_phase(current_player):
-    '''
-    Gameplay starts with players moving some cards to their resource deck.
-    Other miscellaneous events may occur here before moving on to the next
-    phase of the game.
-    '''
-    for x in xrange(STARTING_RESOURCES):
-        current_player.main_deck.move_card_to_deck(
-            current_player.resource_deck)
+class TheGame(object):
 
+    def main(self):
+        Player1 = Player('Player1')
+        Player2 = Player('Player2')
+        players = [Player1, Player2]
+        self.start_game(players)
 
-def deploy_phase():
-    pass
+        for game_round in xrange(TEST_ROUNDS):
+            import pdb; pdb.set_trace()
+            for current_player in players:
+                self.opening_phase(current_player)
+                self.deploy_phase()
+                self.move_phase()
+                self.attack_phase()
+                self.end_phase()
 
+    def start_game(self, players):
+        for player in players:
+            for x in xrange(START_HAND_SIZE):
+                player.draw_to_hand('main')
+            player.randomize_decks()
 
-def move_phase():
-    pass
+    def opening_phase(self, current_player):
+        '''
+        Gameplay starts with players moving some cards to their resource deck.
+        Other miscellaneous events may occur here before moving on to the next
+        phase of the game.
+        '''
+        for x in xrange(STARTING_RESOURCES):
+            current_player.main_deck.move_card_to_deck(
+                current_player.resource_deck)
 
+    def deploy_phase(self):
+        pass
 
-def attack_phase():
-    pass
+    def move_phase(self):
+        pass
 
+    def attack_phase(self):
+        pass
 
-def end_phase():
-    pass
+    def end_phase(self):
+        pass
 
 
 def get_random_card():
     card = Card()
     return card
 
-
-def start_game(players):
-    for player in players:
-        for x in xrange(START_HAND_SIZE):
-            player.draw_to_hand('main')
-        player.randomize_decks()
-
-
-def main():
-    Player1 = Player('Player1')
-    Player2 = Player('Player2')
-    players = [Player1, Player2]
-    start_game(players)
-
-    for game_round in xrange(TEST_ROUNDS):
-        import pdb; pdb.set_trace()
-        for current_player in players:
-            opening_phase(current_player)
-            deploy_phase()
-            move_phase()
-            attack_phase()
-            end_phase()
-
 if __name__ == '__main__':
-    main()
+    play_a_game = TheGame()
+    play_a_game.main()
