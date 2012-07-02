@@ -43,12 +43,15 @@ class Deck(object):
     def __len__(self):
         return len(self.cards_in_deck)
 
-    def add_card(self, card):
+    def add_card(self, card, creation=False):
         '''
         Add a card to the deck.
+        If this is during the creation of the deck (beginning
+        of game) then give the card an id.
         '''
         self.cards_in_deck.append(card)
-        card.get_id(len(self.cards_in_deck))
+        if creation:
+            card.get_id(len(self.cards_in_deck))
 
     def move_card_to_deck(self, deck):
         '''

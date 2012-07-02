@@ -30,7 +30,7 @@ class Player(object):
         used_deck = UsedDeck()
         for opening_card in xrange(main_deck.start_size):
             card = get_random_card(self)
-            main_deck.add_card(card)
+            main_deck.add_card(card, creation=True)
         return main_deck, resource_deck, used_deck
 
     def receive_card(self, card):
