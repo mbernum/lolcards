@@ -84,6 +84,14 @@ class Player(object):
         card_to_play = self.hand.pop(self.hand.index(card_to_play))
         return card_to_play
 
+    def recycle_used_deck(self):
+        '''
+        Move cards from the used deck to the bottom of the
+        main deck. This typically happens at end of turn
+        but may happen other times.
+        '''
+        self.used_deck.recycle_to_main(self.main_deck)
+
 
 class TheGame(object):
     def __init__(self):
@@ -133,7 +141,7 @@ class TheGame(object):
                 self.deploy_phase(current_player)
                 self.move_phase()
                 self.attack_phase()
-                self.end_phase()
+                self.end_phase(current_player)
 
     def start_game(self, players):
         for player in players:
@@ -173,8 +181,8 @@ class TheGame(object):
     def attack_phase(self):
         pass
 
-    def end_phase(self):
-        pass
+    def end_phase(self, current_player):
+        current_player.recycle_used_deck()
 
 
 def get_random_card(owner):

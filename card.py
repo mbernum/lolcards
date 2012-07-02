@@ -100,3 +100,13 @@ class UsedDeck(Deck):
 
     def __repr__(self):
         return "<UsedDeck #cards:%s>" % len(self.cards_in_deck)
+
+    def recycle_to_main(self, main_deck):
+        '''
+        Move cards from the used deck to the bottom of the
+        main deck. This typically happens at end of turn
+        but may happen other times.
+        '''
+        if len(self.cards_in_deck) > 0:
+            main_deck.cards_in_deck.extend(self.cards_in_deck)
+            self.cards_in_deck = []
