@@ -1,4 +1,5 @@
 from card import Card, MainDeck, ResourceDeck, UsedDeck
+from pprint import pprint
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
@@ -77,7 +78,9 @@ class Player(object):
         if card_to_play.cost > len(self.resource_deck):
             print 'You do not have enough resources to play this card.'
             return False
-        self.resource_deck.move_card_to_deck(self.used_deck)
+        for x in xrange(0, card_to_play.cost):  # Pay cost of card
+            self.resource_deck.move_card_to_deck(self.used_deck)
+
         card_to_play = self.hand.pop(self.hand.index(card_to_play))
         return card_to_play
 
@@ -85,6 +88,39 @@ class Player(object):
 class TheGame(object):
     def __init__(self):
         self.game_field = []  # List of Cards that are in play
+
+    def command_line(self, current_player, phase_commands=None):
+        '''
+        Show basic command line and ask for player input.
+        If unrecognized command, return False.
+        If not basic command, return command and have
+        phase function deal with it.
+        '''
+        commands = ['done', 'field', 'hand', 'decks', 'exit']
+        if phase_commands is not None:
+            commands.extend(phase_commands)
+
+        print '\n%s options: %s' % (current_player.name, str(commands))
+        action = raw_input('Action: ')
+
+        if action not in commands:
+            print 'Not a valid action.'
+            return False
+        elif action == 'field':
+            print 'Cards in field:'
+            pprint(self.game_field)
+        elif action == 'hand':
+            print 'Cards in hand:'
+            pprint(current_player.hand)
+        elif action == 'decks':
+            for d in (current_player.resource_deck,
+                      current_player.main_deck,
+                      current_player.used_deck):
+                print d
+        elif action == 'exit':
+            print 'Thank you for playing!'
+            exit()
+        return action
 
     def main(self):
         Player1 = Player('Player1')
@@ -120,27 +156,16 @@ class TheGame(object):
         Deploy cards
         '''
         action = None
-        legit_commands = ('play', 'done', 'field', 'hand', 'decks')
+        deploy_commands = ['play']
         while action != 'done':
-            print '\nOptions: %s' % str(legit_commands)
-            action = raw_input('Action: ')
-            if action not in legit_commands:
-                print 'Not a valid option.'
+            action = self.command_line(current_player, deploy_commands)
+            if not action:
                 continue
             if action == 'play':
                 card_id = raw_input('Card id to play: ')
                 card_to_play = current_player.play_card(int(card_id))
                 if card_to_play:
                     self.game_field.append(card_to_play)
-            elif action == 'field':
-                print 'Card in field: %s' % self.game_field
-            elif action == 'hand':
-                print 'Cards in hand: %s' % current_player.hand
-            elif action == 'decks':
-                for d in (current_player.resource_deck,
-                          current_player.main_deck,
-                          current_player.used_deck):
-                    print d
 
     def move_phase(self):
         pass
