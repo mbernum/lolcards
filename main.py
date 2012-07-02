@@ -28,7 +28,7 @@ class Player(object):
         resource_deck = ResourceDeck()
         used_deck = UsedDeck()
         for opening_card in xrange(main_deck.start_size):
-            card = get_random_card()
+            card = get_random_card(self)
             main_deck.add_card(card)
         return main_deck, resource_deck, used_deck
 
@@ -56,29 +56,54 @@ class Player(object):
         for d in (self.main_deck, self.resource_deck, self.used_deck):
             d.randomize_cards()
 
+    def find_card_in_hand(self, card_id):
+        '''
+        Given the card_id, find it in the hand
+        '''
+        for c in self.hand:
+            if c.card_id == card_id:
+                return c
+        return False
+
+    def play_card(self, card_id):
+        '''
+        Take card from hand. Return that card.
+        Returns false if can not find card in hand.
+        '''
+        card_to_play = self.find_card_in_hand(card_id)
+        if not card_to_play:
+            print 'Can not find card %s in hand.' % card_id
+            return False
+        if card_to_play.cost > len(self.resource_deck):
+            print 'You do not have enough resources to play this card.'
+            return False
+        self.resource_deck.move_card_to_deck(self.used_deck)
+        card_to_play = self.hand.pop(self.hand.index(card_to_play))
+        return card_to_play
+
 
 class TheGame(object):
+    def __init__(self):
+        self.game_field = []  # List of Cards that are in play
 
     def main(self):
         Player1 = Player('Player1')
         Player2 = Player('Player2')
         players = [Player1, Player2]
         self.start_game(players)
-
         for game_round in xrange(TEST_ROUNDS):
-            import pdb; pdb.set_trace()
             for current_player in players:
                 self.opening_phase(current_player)
-                self.deploy_phase()
+                self.deploy_phase(current_player)
                 self.move_phase()
                 self.attack_phase()
                 self.end_phase()
 
     def start_game(self, players):
         for player in players:
+            player.randomize_decks()
             for x in xrange(START_HAND_SIZE):
                 player.draw_to_hand('main')
-            player.randomize_decks()
 
     def opening_phase(self, current_player):
         '''
@@ -90,8 +115,32 @@ class TheGame(object):
             current_player.main_deck.move_card_to_deck(
                 current_player.resource_deck)
 
-    def deploy_phase(self):
-        pass
+    def deploy_phase(self, current_player):
+        '''
+        Deploy cards
+        '''
+        action = None
+        legit_commands = ('play', 'done', 'field', 'hand', 'decks')
+        while action != 'done':
+            print '\nOptions: %s' % str(legit_commands)
+            action = raw_input('Action: ')
+            if action not in legit_commands:
+                print 'Not a valid option.'
+                continue
+            if action == 'play':
+                card_id = raw_input('Card id to play: ')
+                card_to_play = current_player.play_card(int(card_id))
+                if card_to_play:
+                    self.game_field.append(card_to_play)
+            elif action == 'field':
+                print 'Card in field: %s' % self.game_field
+            elif action == 'hand':
+                print 'Cards in hand: %s' % current_player.hand
+            elif action == 'decks':
+                for d in (current_player.resource_deck,
+                          current_player.main_deck,
+                          current_player.used_deck):
+                    print d
 
     def move_phase(self):
         pass
@@ -103,8 +152,8 @@ class TheGame(object):
         pass
 
 
-def get_random_card():
-    card = Card()
+def get_random_card(owner):
+    card = Card(owner=owner)
     return card
 
 if __name__ == '__main__':

@@ -5,17 +5,20 @@ MAX_DECK_SIZE = 50
 
 class Card(object):
 
-    def __init__(self):
+    def __init__(self, owner=None):
         self.name = None
         self.card_type = None
         self.cost = None
         self.card_id = None
+        self.owner = owner
 
     def __repr__(self):
-        return "<Card id: %s name:%s type:%s cost:%s>" % (self.card_id,
-                                                          self.name,
-                                                          self.card_type,
-                                                          self.cost)
+        return "<Card id: %s name:%s type:%s cost:%s owner:%s>" % \
+               (self.card_id,
+                self.name,
+                self.card_type,
+                self.cost,
+                self.owner.name)
 
     def get_id(self, card_id):
         '''
@@ -36,6 +39,9 @@ class Deck(object):
 
     def __repr__(self):
         return "<Deck #cards:%s>" % len(self.cards_in_deck)
+
+    def __len__(self):
+        return len(self.cards_in_deck)
 
     def add_card(self, card):
         '''
@@ -59,7 +65,7 @@ class Deck(object):
         '''
         for x in self.cards_in_deck:
             x.name = 'Card %x' % randrange(10000, 99999)
-            x.cost = randrange(0, 10)
+            x.cost = randrange(0, 7)
 
 
 class MainDeck(Deck):
