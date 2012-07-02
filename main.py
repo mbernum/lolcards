@@ -1,5 +1,8 @@
-from card import Card, MainDeck, ResourceDeck, UsedDeck
 from pprint import pprint
+from random import randrange
+
+from card import Card, Character
+from card import MainDeck, ResourceDeck, UsedDeck
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
@@ -186,7 +189,11 @@ class TheGame(object):
 
 
 def get_random_card(owner):
-    card = Card(owner=owner)
+    character_chance = randrange(0, 10)
+    if character_chance > 8:  # Randomly choose a character
+        card = Character(owner=owner)
+    else:  # Otherwise just default card
+        card = Card(owner=owner)
     return card
 
 if __name__ == '__main__':

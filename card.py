@@ -13,18 +13,50 @@ class Card(object):
         self.owner = owner
 
     def __repr__(self):
-        return "<Card id: %s name:%s type:%s cost:%s owner:%s>" % \
-               (self.card_id,
-                self.name,
-                self.card_type,
-                self.cost,
-                self.owner.name)
+        return "<Card id: %s name:%s cost:%s owner:%s>" % (self.card_id,
+                                                           self.name,
+                                                           self.cost,
+                                                           self.owner.name)
 
     def get_id(self, card_id):
         '''
         Deck will inform us which number card it is in the deck.
         '''
         self.card_id = card_id
+
+    def randomize_stats(self):
+        '''
+        For testing, randomize card stats. Give random name and
+        other needed stats for the card.
+        '''
+        self.name = 'Card %x' % randrange(10000, 99999)
+        self.cost = randrange(0, 7)
+
+
+class Character(Card):
+    '''
+    A card that will do battle with other character cards.
+    Primarily will do damage to opponent to win the game.
+    '''
+
+    def __init__(self, owner=None, attack=None, defense=None, health=None):
+        self.attack_value = attack
+        self.defense_value = defense
+        self.health_value = health
+        super(Character, self).__init__(owner=owner)
+
+    def __repr__(self):
+        return "<CharacterCard id: %s name:%s cost:%s owner:%s>" % \
+               (self.card_id,
+                self.name,
+                self.cost,
+                self.owner.name)
+
+    def randomize_stats(self):
+        self.attack_value = randrange(0, 5)
+        self.defense_value = randrange(0, 5)
+        self.health_value = randrange(0, 10)
+        super(Character, self).randomize_stats()
 
 
 class Deck(object):
@@ -67,8 +99,7 @@ class Deck(object):
         other needed stats for the cards.
         '''
         for x in self.cards_in_deck:
-            x.name = 'Card %x' % randrange(10000, 99999)
-            x.cost = randrange(0, 7)
+            x.randomize_stats()
 
 
 class MainDeck(Deck):
