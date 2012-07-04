@@ -1,6 +1,7 @@
 from pprint import pprint
 
 from player import Player
+from card import Character
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
@@ -20,7 +21,6 @@ class TheGame(object):
             if c.card_id == card_id and c.owner == target_player:
                 return c
         return False
-
 
     def command_line(self, current_player, phase_commands=None):
         '''
@@ -48,7 +48,8 @@ class TheGame(object):
         elif action == 'decks':
             for d in (current_player.resource_deck,
                       current_player.main_deck,
-                      current_player.used_deck):
+                      current_player.used_deck,
+                      current_player.discard_pile):
                 print d
         elif action == 'exit':
             print 'Thank you for playing!'
@@ -142,6 +143,14 @@ class TheGame(object):
 
                 damage_done = card_attacking.attack(card_to_attack)
                 print 'Damage done: %s' % damage_done
+        discard_cards = []
+        for c in self.game_field:  # Check which cards need to be discarded
+            if type(c) == Character and c.health_value <= 0:
+                discard_cards.append(c)
+        for c in discard_cards:
+            card_to_discard = self.game_field.pop(self.game_field.index(c))
+            card_to_discard.owner.discard_pile.add_card(card_to_discard)
+            print 'Moved %s to discard pile.' % card_to_discard.name
 
     def end_phase(self, current_player):
         current_player.recycle_used_deck()

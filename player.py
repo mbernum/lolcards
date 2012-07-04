@@ -1,7 +1,7 @@
 from random import randrange
 
 from card import Card, Character
-from card import MainDeck, ResourceDeck, UsedDeck
+from card import MainDeck, ResourceDeck, UsedDeck, DiscardPile
 
 
 class Player(object):
@@ -9,10 +9,11 @@ class Player(object):
         self.name = name
         self.hand = []
 
-        main_deck, resource_deck, used_deck = self.start_decks()
+        main_deck, resource_deck, used_deck, discard_pile = self.start_decks()
         self.main_deck = main_deck
         self.resource_deck = resource_deck
         self.used_deck = used_deck
+        self.discard_pile = discard_pile
 
     def __repr__(self):
         return "<Player name:%s hand:%s>" % (self.name,
@@ -26,10 +27,11 @@ class Player(object):
         main_deck = MainDeck()
         resource_deck = ResourceDeck()
         used_deck = UsedDeck()
+        discard_pile = DiscardPile()
         for opening_card in xrange(main_deck.start_size):
             card = get_random_card(self)
             main_deck.add_card(card, creation=True)
-        return main_deck, resource_deck, used_deck
+        return main_deck, resource_deck, used_deck, discard_pile
 
     def receive_card(self, card):
         '''

@@ -172,3 +172,13 @@ class UsedDeck(Deck):
         if len(self.cards_in_deck) > 0:
             main_deck.cards_in_deck.extend(self.cards_in_deck)
             self.cards_in_deck = []
+
+
+class DiscardPile(Deck):
+    '''
+    Cards that are discarded go here. This may be from being killed in battle
+    or removed from the game field by some other means.
+    '''
+
+    def __repr__(self):
+        return "<DiscardPile #cards:%s>" % len(self.cards_in_deck)
