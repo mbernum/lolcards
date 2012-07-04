@@ -93,7 +93,7 @@ class Player(object):
 
 def get_random_card(owner):
     character_chance = randrange(0, 10)
-    if character_chance > 8:  # Randomly choose a character
+    if character_chance > 4:  # Randomly choose a character
         card = Character(owner=owner)
     else:  # Otherwise just default card
         card = Card(owner=owner)

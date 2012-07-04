@@ -11,6 +11,17 @@ class TheGame(object):
     def __init__(self):
         self.game_field = []  # List of Cards that are in play
 
+    def find_card_on_field(self, card_id, target_player):
+        '''
+        Find a card on the field for a certain player given the card
+        id and the player.
+        '''
+        for c in self.game_field:
+            if c.card_id == card_id and c.owner == target_player:
+                return c
+        return False
+
+
     def command_line(self, current_player, phase_commands=None):
         '''
         Show basic command line and ask for player input.
@@ -45,19 +56,28 @@ class TheGame(object):
         return action
 
     def main(self):
+        '''
+        Player creation and game phases. Basic functions of gameplay
+        and how the game moves from phase to phase.
+        '''
         Player1 = Player('Player1')
         Player2 = Player('Player2')
         players = [Player1, Player2]
+        enemy_player = players[1]
         self.start_game(players)
         for game_round in xrange(TEST_ROUNDS):
             for current_player in players:
                 self.opening_phase(current_player)
                 self.deploy_phase(current_player)
                 self.move_phase()
-                self.attack_phase()
+                self.attack_phase(current_player, enemy_player)
                 self.end_phase(current_player)
+                enemy_player = current_player
 
     def start_game(self, players):
+        '''
+        Deck creation and other starting options needed for players.
+        '''
         for player in players:
             player.randomize_decks()
             for x in xrange(START_HAND_SIZE):
@@ -80,6 +100,7 @@ class TheGame(object):
         action = None
         deploy_commands = ['play']
         while action != 'done':
+            print 'Deploy Phase'
             action = self.command_line(current_player, deploy_commands)
             if not action:
                 continue
@@ -92,8 +113,35 @@ class TheGame(object):
     def move_phase(self):
         pass
 
-    def attack_phase(self):
-        pass
+    def attack_phase(self, current_player, enemy_player):
+        '''
+        Characters on field may attack one another or any other valid target.
+        '''
+        action = None
+        attack_commands = ['attack']
+        while action != 'done':
+            print 'Attack Phase'
+            action = self.command_line(current_player, attack_commands)
+            if not action:
+                continue
+            if action == 'attack':
+                print 'Field:'
+                pprint(self.game_field)
+                card_id = raw_input('Card id attacking: ')
+                card_attacking = self.find_card_on_field(int(card_id),
+                                                      current_player)
+                if not card_attacking:
+                    print 'Can not find that card you own.'
+                    continue
+                card_id = raw_input('Card id to attack: ')
+                card_to_attack = self.find_card_on_field(int(card_id),
+                                                         enemy_player)
+                if not card_to_attack:
+                    print 'Can not find that enemy card on field.'
+                    continue
+
+                damage_done = card_attacking.attack(card_to_attack)
+                print 'Damage done: %s' % damage_done
 
     def end_phase(self, current_player):
         current_player.recycle_used_deck()

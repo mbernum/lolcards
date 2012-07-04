@@ -42,20 +42,48 @@ class Character(Card):
     def __init__(self, owner=None, attack=None, defense=None, health=None):
         self.attack_value = attack
         self.defense_value = defense
+        self.max_health_value = health
         self.health_value = health
         super(Character, self).__init__(owner=owner)
 
     def __repr__(self):
-        return "<CharacterCard id: %s name:%s cost:%s owner:%s>" % \
+        return "<CharacterCard id: %s name:%s cost:%s owner:%s hp:%s/%s \
+a/d:%s/%s>" % \
                (self.card_id,
                 self.name,
                 self.cost,
-                self.owner.name)
+                self.owner.name,
+                self.health_value,
+                self.max_health_value,
+                self.attack_value,
+                self.defense_value)
+
+    def take_damage(self, damage):
+        '''
+        Given a value, this is how much damage is done to the cards health
+        value. Will take into account any possible "shield" effects.
+        If health drops to zero, will be discarded (goto lost pile).
+        '''
+        self.health_value -= damage
+
+    def attack(self, card_to_attack):
+        '''
+        Compare attack and defense values against the enemy card and deal
+        appropriate damage (if any). Returns damage done.
+        '''
+        damage = self.attack_value - card_to_attack.defense_value
+        if damage > 0:
+            card_to_attack.take_damage(damage)
+        else:
+            print 'No damage done.'
+        return damage
 
     def randomize_stats(self):
         self.attack_value = randrange(0, 5)
         self.defense_value = randrange(0, 5)
-        self.health_value = randrange(0, 10)
+        health = randrange(0, 10)
+        self.health_value = health
+        self.max_health_value = health
         super(Character, self).randomize_stats()
 
 
