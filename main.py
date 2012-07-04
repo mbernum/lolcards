@@ -8,16 +8,44 @@ TEST_ROUNDS = 4
 STARTING_RESOURCES = 3
 
 
+class GameField(object):
+    def __init__(self):
+        self.field = []
+
+    def add_card(self, player_card):
+        '''
+        Add a card to the field.
+        '''
+        self.field.append(player_card)
+
+    def discard_card(self, card_to_discard):
+        self.field.pop(self.field.index(card_to_discard))
+        card_to_discard.owner.discard_pile.add_card(card_to_discard)
+        print 'Moved %s to discard pile.' % card_to_discard.name
+
+    def remove_dead_cards(self):
+        '''
+        Check the field for cards that should be sent do discard pile, such as
+        character cards with no health left or expired spells or effects.
+        '''
+        discard_cards = []
+        for c in self.field:
+            if type(c) == Character and c.health_value <= 0:
+                discard_cards.append(c)
+        for c in discard_cards:
+            self.discard_card(c)
+
+
 class TheGame(object):
     def __init__(self):
-        self.game_field = []  # List of Cards that are in play
+        self.game_field = GameField()  # List of Cards that are in play
 
     def find_card_on_field(self, card_id, target_player):
         '''
         Find a card on the field for a certain player given the card
         id and the player.
         '''
-        for c in self.game_field:
+        for c in self.game_field.field:
             if c.card_id == card_id and c.owner == target_player:
                 return c
         return False
@@ -41,7 +69,7 @@ class TheGame(object):
             return False
         elif action == 'field':
             print 'Cards in field:'
-            pprint(self.game_field)
+            pprint(self.game_field.field)
         elif action == 'hand':
             print 'Cards in hand:'
             pprint(current_player.hand)
@@ -109,7 +137,7 @@ class TheGame(object):
                 card_id = raw_input('Card id to play: ')
                 card_to_play = current_player.play_card(int(card_id))
                 if card_to_play:
-                    self.game_field.append(card_to_play)
+                    self.game_field.add_card(card_to_play)
 
     def move_phase(self):
         pass
@@ -127,7 +155,7 @@ class TheGame(object):
                 continue
             if action == 'attack':
                 print 'Field:'
-                pprint(self.game_field)
+                pprint(self.game_field.field)
                 card_id = raw_input('Card id attacking: ')
                 card_attacking = self.find_card_on_field(int(card_id),
                                                       current_player)
@@ -143,14 +171,7 @@ class TheGame(object):
 
                 damage_done = card_attacking.attack(card_to_attack)
                 print 'Damage done: %s' % damage_done
-        discard_cards = []
-        for c in self.game_field:  # Check which cards need to be discarded
-            if type(c) == Character and c.health_value <= 0:
-                discard_cards.append(c)
-        for c in discard_cards:
-            card_to_discard = self.game_field.pop(self.game_field.index(c))
-            card_to_discard.owner.discard_pile.add_card(card_to_discard)
-            print 'Moved %s to discard pile.' % card_to_discard.name
+        self.game_field.remove_dead_cards()
 
     def end_phase(self, current_player):
         current_player.recycle_used_deck()
