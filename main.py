@@ -12,6 +12,25 @@ class GameField(object):
     def __init__(self):
         self.field = []
 
+    def exposed_characters(self):
+        '''
+        Look through the field and find which character cards are exposed.
+        Exposed characters are ones not next to towers.
+        If not exposed, the character is considered to be defending, towers
+        will retaliate then.
+        '''
+        exposed_characters = [c for c in self.field
+                              if type(c) == Character and c.exposed == True]
+        return exposed_characters
+
+    def defending_characters(self):
+        '''
+        Look through the field and find which characters cards are defending.
+        '''
+        defending_characters = [c for c in self.field
+                                if type(c) == Character and c.exposed == False]
+        return defending_characters
+
     def add_card(self, player_card):
         '''
         Add a card to the field.
@@ -19,6 +38,9 @@ class GameField(object):
         self.field.append(player_card)
 
     def discard_card(self, card_to_discard):
+        '''
+        Move target card to the discard pile.
+        '''
         self.field.pop(self.field.index(card_to_discard))
         card_to_discard.owner.discard_pile.add_card(card_to_discard)
         print 'Moved %s to discard pile.' % card_to_discard.name
@@ -70,6 +92,10 @@ class TheGame(object):
         elif action == 'field':
             print 'Cards in field:'
             pprint(self.game_field.field)
+            print 'Exposed:'
+            pprint(self.game_field.exposed_characters())
+            print 'Defending:'
+            pprint(self.game_field.defending_characters())
         elif action == 'hand':
             print 'Cards in hand:'
             pprint(current_player.hand)
@@ -98,7 +124,7 @@ class TheGame(object):
             for current_player in players:
                 self.opening_phase(current_player)
                 self.deploy_phase(current_player)
-                self.move_phase()
+                self.move_phase(current_player)
                 self.attack_phase(current_player, enemy_player)
                 self.end_phase(current_player)
                 enemy_player = current_player
@@ -138,9 +164,34 @@ class TheGame(object):
                 card_to_play = current_player.play_card(int(card_id))
                 if card_to_play:
                     self.game_field.add_card(card_to_play)
+                    if type(card_to_play) == Character:
+                        # Characters start next to towers
+                        card_to_play.exposed = False
 
-    def move_phase(self):
-        pass
+    def move_phase(self, current_player):
+        '''
+        Characters can move from defending to exposed.
+        '''
+        action = None
+        move_commands = ['move']
+        while action != 'done':
+            print 'Move phase'
+            action = self.command_line(current_player, move_commands)
+            if not action:
+                continue
+            if action == 'move':
+                card_id = raw_input('Card id to move: ')
+                card_to_move = self.find_card_on_field(int(card_id),
+                                                       current_player)
+                if not card_to_move:
+                    print 'Can not find that card you own.'
+                    continue
+                if type(card_to_move) != Character:
+                    print 'That card is not a character & can not move.'
+                    continue
+                moved = card_to_move.move()
+                print 'Moved %s to %s.' % (card_to_move.name,
+                                           'exposed' if moved else 'defending')
 
     def attack_phase(self, current_player, enemy_player):
         '''
@@ -158,7 +209,7 @@ class TheGame(object):
                 pprint(self.game_field.field)
                 card_id = raw_input('Card id attacking: ')
                 card_attacking = self.find_card_on_field(int(card_id),
-                                                      current_player)
+                                                         current_player)
                 if not card_attacking:
                     print 'Can not find that card you own.'
                     continue
@@ -168,8 +219,12 @@ class TheGame(object):
                 if not card_to_attack:
                     print 'Can not find that enemy card on field.'
                     continue
-
-                damage_done = card_attacking.attack(card_to_attack)
+                if card_attacking.exposed == True or \
+                       card_to_attack.exposed == True:
+                    damage_done = card_attacking.attack(card_to_attack)
+                else:
+                    print 'Neither card is exposed, can not attack.'
+                    continue
                 print 'Damage done: %s' % damage_done
         self.game_field.remove_dead_cards()
 

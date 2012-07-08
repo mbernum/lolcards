@@ -44,6 +44,7 @@ class Character(Card):
         self.defense_value = defense
         self.max_health_value = health
         self.health_value = health
+        self.exposed = None  # When in play, next to a tower or not (bool then)
         super(Character, self).__init__(owner=owner)
 
     def __repr__(self):
@@ -77,6 +78,16 @@ a/d:%s/%s>" % \
         else:
             print 'No damage done.'
         return damage
+
+    def move(self):
+        '''
+        Move from exposed to defending or defending to exposed.
+        '''
+        if self.exposed == False:
+            self.exposed = True
+        else:
+            self.exposed = False
+        return self.exposed
 
     def randomize_stats(self):
         self.attack_value = randrange(0, 5)
