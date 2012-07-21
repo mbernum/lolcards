@@ -134,6 +134,10 @@ class TheGame(object):
         Deck creation and other starting options needed for players.
         '''
         for player in players:
+            towers = player.main_deck.get_towers()
+            for tower in towers:
+                self.game_field.add_card(tower)
+                tower.exposed = False
             player.randomize_decks()
             for x in xrange(START_HAND_SIZE):
                 player.draw_to_hand('main')
@@ -188,6 +192,10 @@ class TheGame(object):
                     continue
                 if type(card_to_move) != Character:
                     print 'That card is not a character & can not move.'
+                    continue
+                if type(card_to_move) == Character and \
+                       card_to_move.name.startswith('Tower'):
+                    print 'You can not move towers.'
                     continue
                 moved = card_to_move.move()
                 print 'Moved %s to %s.' % (card_to_move.name,

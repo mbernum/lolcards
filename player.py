@@ -3,6 +3,8 @@ from random import randrange
 from card import Card, Character
 from card import MainDeck, ResourceDeck, UsedDeck, DiscardPile
 
+MAX_TOWERS = 3
+
 
 class Player(object):
     def __init__(self, name):
@@ -28,10 +30,27 @@ class Player(object):
         resource_deck = ResourceDeck()
         used_deck = UsedDeck()
         discard_pile = DiscardPile()
+
         for opening_card in xrange(main_deck.start_size):
             card = get_random_card(self)
             main_deck.add_card(card, creation=True)
+
+        towers = self.set_up_towers()
+        for tower in towers:
+            main_deck.add_card(tower, creation=True)
+
         return main_deck, resource_deck, used_deck, discard_pile
+
+    def set_up_towers(self):
+        '''
+        Each player starts with three towers on the field.
+        This does not count against max cards in deck.
+        Towers are essentially defending characters with some restrictions.
+        '''
+        towers = [Character(owner=self, name='Tower %s' % x,
+                            attack=3, defense=3, health=5, cost=0)
+                  for x in xrange(0, 3)]
+        return towers
 
     def receive_card(self, card):
         '''

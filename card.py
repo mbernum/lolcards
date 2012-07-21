@@ -5,10 +5,10 @@ MAX_DECK_SIZE = 50
 
 class Card(object):
 
-    def __init__(self, owner=None):
-        self.name = None
+    def __init__(self, owner=None, name=None, cost=None):
+        self.name = name
         self.card_type = None
-        self.cost = None
+        self.cost = cost
         self.card_id = None
         self.owner = owner
 
@@ -39,13 +39,14 @@ class Character(Card):
     Primarily will do damage to opponent to win the game.
     '''
 
-    def __init__(self, owner=None, attack=None, defense=None, health=None):
+    def __init__(self, owner=None, attack=None, defense=None, health=None,
+                 name=None, cost=None):
         self.attack_value = attack
         self.defense_value = defense
         self.max_health_value = health
         self.health_value = health
         self.exposed = None  # When in play, next to a tower or not (bool then)
-        super(Character, self).__init__(owner=owner)
+        super(Character, self).__init__(owner=owner, name=name, cost=cost)
 
     def __repr__(self):
         return "<CharacterCard id: %s name:%s cost:%s owner:%s hp:%s/%s \
@@ -149,6 +150,19 @@ class MainDeck(Deck):
 
     def __repr__(self):
         return "<MainDeck #cards:%s>" % len(self.cards_in_deck)
+
+    def get_towers(self):
+        '''
+        Find towers in the deck.
+        '''
+        towers = []
+        for c in self.cards_in_deck:
+            if type(c) == Character and c.name is not None and \
+                   c.name.startswith('Tower'):
+                towers.append(c)
+        for tower in towers:
+            self.cards_in_deck.pop(self.cards_in_deck.index(tower))
+        return towers
 
 
 class ResourceDeck(Deck):
