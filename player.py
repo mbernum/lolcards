@@ -1,6 +1,6 @@
 from random import randrange
 
-from card import Card, Character
+from card import Card, Character, Item
 from card import MainDeck, ResourceDeck, UsedDeck, DiscardPile
 
 MAX_TOWERS = 3
@@ -113,9 +113,11 @@ class Player(object):
 
 
 def get_random_card(owner):
-    character_chance = randrange(0, 10)
-    if character_chance > 4:  # Randomly choose a character
+    card_chance = randrange(0, 10)
+    if card_chance >= 0 and card_chance <= 4:  # Randomly choose a character
         card = Character(owner=owner)
+    elif card_chance >= 5 and card_chance <= 8:
+        card = Item(owner=owner)
     else:  # Otherwise just default card
         card = Card(owner=owner)
     return card

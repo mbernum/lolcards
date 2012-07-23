@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from player import Player
-from card import Character
+from card import Character, Item
 
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
@@ -171,6 +171,15 @@ class TheGame(object):
                     if type(card_to_play) == Character:
                         # Characters start next to towers
                         card_to_play.exposed = False
+                    if type(card_to_play) == Item:
+                        attach_to = raw_input('Card id to attach to: ')
+                        attach_to = self.find_card_on_field(int(attach_to),
+                                                            current_player)
+                        if type(attach_to) != Character:
+                            print 'Must attach to character cards.'
+                        if not attach_to:
+                            print 'Can not find that card on field.'
+                        attach_to.attach_item(card_to_play)
 
     def move_phase(self, current_player):
         '''

@@ -39,18 +39,19 @@ class Character(Card):
     Primarily will do damage to opponent to win the game.
     '''
 
-    def __init__(self, owner=None, attack=None, defense=None, health=None,
-                 name=None, cost=None):
+    def __init__(self, owner=None, name=None, cost=None, attack=None,
+                 defense=None, health=None):
         self.attack_value = attack
         self.defense_value = defense
         self.max_health_value = health
         self.health_value = health
+        self.items = []
         self.exposed = None  # When in play, next to a tower or not (bool then)
         super(Character, self).__init__(owner=owner, name=name, cost=cost)
 
     def __repr__(self):
         return "<CharacterCard id: %s name:%s cost:%s owner:%s hp:%s/%s \
-a/d:%s/%s>" % \
+a/d:%s/%s items: %s>" % \
                (self.card_id,
                 self.name,
                 self.cost,
@@ -58,7 +59,24 @@ a/d:%s/%s>" % \
                 self.health_value,
                 self.max_health_value,
                 self.attack_value,
-                self.defense_value)
+                self.defense_value,
+                self.items)
+
+    def total_defense(self):
+        '''
+        Return the characters defense value, including buffs.
+        '''
+        buffs = self.check_buffs()
+        defense = buffs['defense_value'] + self.defense_value
+        return defense
+
+    def total_attack(self):
+        '''
+        Return the character attack value, including buffs.
+        '''
+        buffs = self.check_buffs()
+        attack = buffs['attack_value'] + self.attack_value
+        return attack
 
     def take_damage(self, damage):
         '''
@@ -73,7 +91,7 @@ a/d:%s/%s>" % \
         Compare attack and defense values against the enemy card and deal
         appropriate damage (if any). Returns damage done.
         '''
-        damage = self.attack_value - card_to_attack.defense_value
+        damage = self.total_attack() - card_to_attack.total_defense()
         if damage > 0:
             card_to_attack.take_damage(damage)
         else:
@@ -90,6 +108,29 @@ a/d:%s/%s>" % \
             self.exposed = False
         return self.exposed
 
+    def attach_item(self, attached_item):
+        '''
+        Given an item, attach it to the character.
+        '''
+        if type(attached_item) != Item:
+            return False
+        self.items.append(attached_item)
+        return True
+
+    def check_buffs(self):
+        '''
+        Check to see if character has buffs from items, spells, etc.
+        '''
+        buffs = {'attack_value': 0,
+                 'defense_value': 0,
+                 'health_value': 0}
+        for i in self.items:
+            item_buffs = i.get_buffs()
+            buffs['attack_value'] += item_buffs['attack_value']
+            buffs['defense_value'] += item_buffs['defense_value']
+            buffs['health_value'] += item_buffs['health_value']
+        return buffs
+
     def randomize_stats(self):
         self.attack_value = randrange(0, 5)
         self.defense_value = randrange(0, 5)
@@ -97,6 +138,68 @@ a/d:%s/%s>" % \
         self.health_value = health
         self.max_health_value = health
         super(Character, self).randomize_stats()
+
+
+class Spell(Card):
+    '''
+    Cards that are played by the "summoner" (player). These are generally
+    effects played upon enemy character cards or possibly even on the enemy
+    player directly.
+
+    Effects of spells can be numerous and can potentially do anything (within
+    game balance reasons of course), including changing the rules of the game.
+    '''
+
+    def __init__(self, owner=None, name=None, cost=None, target=None):
+        self.target = target
+        super(Spell, self).__init__(owner=owner, name=name, cost=cost)
+
+
+class Item(Card):
+    '''
+    Item cards are cards that modify the stats of players and may give certain
+    benefits (like a shield).
+    '''
+
+    def __init__(self, owner=None, name=None, cost=None, buffs=None):
+        self.buffs = buffs
+        self.equiped_to = None
+        super(Item, self).__init__(owner=owner, name=name, cost=cost)
+
+    def __repr__(self):
+        return "<ItemCard id: %s name: %s cost: %s buffs: %s>" % (
+            self.card_id,
+            self.name,
+            self.cost,
+            self.buffs)
+
+    def get_buffs(self):
+        '''
+        Check if item card gives buffs. If so, return buffs to what stats.
+        '''
+        buff = {'attack_value': 0,
+                'defense_value': 0,
+                'health_value': 0}
+        buff['attack_value'] += self.buffs.get('attack_value', 0)
+        buff['defense_value'] += self.buffs.get('defense_value', 0)
+        buff['health_value'] += self.buffs.get('health_value', 0)
+        return buff
+
+    def equip_to(self, equip_character):
+        '''
+        Items attach to characters. Give the character who this item is
+        attached to.
+        '''
+        if type(equip_character) != Character:
+            return False
+        self.equiped_to = equip_character
+        return True
+
+    def randomize_stats(self):
+        self.buffs = {'attack_value': randrange(1, 3),
+                      'defense_value': randrange(1, 3),
+                      'health_value': randrange(1, 3)}
+        super(Item, self).randomize_stats()
 
 
 class Deck(object):
