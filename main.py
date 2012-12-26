@@ -1,4 +1,6 @@
+import sys
 from pprint import pprint
+from PyQt4 import QtGui
 
 from player import Player
 from card import Character, Item
@@ -6,11 +8,37 @@ from card import Character, Item
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
 STARTING_RESOURCES = 3
+SCREEN_SIZE = [1200, 750]
 
 
-class GameField(object):
+class GameField(QtGui.QWidget):
     def __init__(self):
         self.field = []
+        super(GameField, self).__init__()
+        self.gui_field()
+
+    def gui_field(self):
+        '''
+        Create window frame to play the game on.
+        '''
+        self.setGeometry(0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1])
+        frame_window = self.frameGeometry()
+        screen_center = QtGui.QDesktopWidget().availableGeometry().center()
+
+        # Move center of frame to screen center
+        frame_window.moveCenter(screen_center)
+        # Move top left application window to top left point of frame_window
+        self.move(frame_window.topLeft())
+
+        #lbl1 = QtGui.QLabel('Zetcode', self)
+        #lbl1.move(15, 10)
+
+        self.card_frame = QtGui.QFrame(self)
+        self.card_frame.setGeometry(20, 20, 130, 150)
+        self.card_frame.setStyleSheet("QWidget { border: 1px solid black }")
+
+        self.setWindowTitle('LoL CCG')
+        self.show()
 
     def exposed_characters(self):
         '''
@@ -250,5 +278,7 @@ class TheGame(object):
 
 
 if __name__ == '__main__':
+    app = QtGui.QApplication(sys.argv)
     play_a_game = TheGame()
     play_a_game.main()
+    sys.exit(app.exec_())
