@@ -11,8 +11,9 @@ STARTING_RESOURCES = 3
 SCREEN_SIZE = [1200, 750]
 
 
-class GameField(QtGui.QWidget):
+class GameField(QtGui.QFrame):
     def __init__(self):
+        #print "*"*8, self
         self.field = []
         super(GameField, self).__init__()
         self.gui_field()
@@ -21,24 +22,24 @@ class GameField(QtGui.QWidget):
         '''
         Create window frame to play the game on.
         '''
-        self.setGeometry(0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1])
-        frame_window = self.frameGeometry()
-        screen_center = QtGui.QDesktopWidget().availableGeometry().center()
+        #self.setGeometry(0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1])
+        #frame_window = self.frameGeometry()
+        #screen_center = QtGui.QDesktopWidget().availableGeometry().center()
 
         # Move center of frame to screen center
-        frame_window.moveCenter(screen_center)
+        #frame_window.moveCenter(screen_center)
         # Move top left application window to top left point of frame_window
-        self.move(frame_window.topLeft())
+        #self.move(frame_window.topLeft())
 
-        #lbl1 = QtGui.QLabel('Zetcode', self)
-        #lbl1.move(15, 10)
+        #hand_label = QtGui.QLabel('Hand', self)
+        #hand_label.move(15, 500)
 
-        self.card_frame = QtGui.QFrame(self)
-        self.card_frame.setGeometry(20, 20, 130, 150)
-        self.card_frame.setStyleSheet("QWidget { border: 1px solid black }")
+        ## self.card_frame = QtGui.QFrame(self)
+        ## self.card_frame.setGeometry(20, 420, 130, 150)
+        ## self.card_frame.setStyleSheet("QWidget { border: 1px solid black }")
 
-        self.setWindowTitle('LoL CCG')
-        self.show()
+        #self.setWindowTitle('LoL CCG')
+        #self.update()
 
     def exposed_characters(self):
         '''
@@ -86,9 +87,22 @@ class GameField(QtGui.QWidget):
             self.discard_card(c)
 
 
-class TheGame(object):
+class TheGame(QtGui.QMainWindow):
     def __init__(self):
+        super(TheGame, self).__init__()
+        self.setGeometry(0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1])
+        self.setWindowTitle('LoL CCG')
+
         self.game_field = GameField()  # List of Cards that are in play
+
+        self.setCentralWidget(self.game_field)
+        self.center_screen()
+
+    def center_screen(self):
+        screen = QtGui.QDesktopWidget().screenGeometry()
+        size = self.geometry()
+        self.move((screen.width() - size.width()) / 2,
+                 (screen.height() - size.height()) / 2)
 
     def find_card_on_field(self, card_id, target_player):
         '''
@@ -135,7 +149,7 @@ class TheGame(object):
                 print d
         elif action == 'exit':
             print 'Thank you for playing!'
-            exit()
+            #exit()
         return action
 
     def main(self):
@@ -143,13 +157,20 @@ class TheGame(object):
         Player creation and game phases. Basic functions of gameplay
         and how the game moves from phase to phase.
         '''
-        Player1 = Player('Player1')
-        Player2 = Player('Player2')
+        Player1 = Player('Player1', self.game_field)
+        Player2 = Player('Player2', self.game_field)
         players = [Player1, Player2]
         enemy_player = players[1]
         self.start_game(players)
+
+        ## self.card_frame = QtGui.QFrame(self.game_field)
+        ## self.card_frame.setGeometry(20, 420, 130, 150)
+        ## self.card_frame.setStyleSheet("QWidget { border: 1px solid black }")
+        #self.game_field.show()
+
         for game_round in xrange(TEST_ROUNDS):
             for current_player in players:
+                return
                 self.opening_phase(current_player)
                 self.deploy_phase(current_player)
                 self.move_phase(current_player)
@@ -280,5 +301,7 @@ class TheGame(object):
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     play_a_game = TheGame()
+
     play_a_game.main()
+    play_a_game.show()
     sys.exit(app.exec_())

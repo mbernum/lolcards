@@ -1,13 +1,14 @@
 from random import randrange
+from PyQt4 import QtGui
 
 MAX_DECK_SIZE = 50
 
 
 class Card(object):
 
-    def __init__(self, owner=None, name=None, cost=None):
+    def __init__(self, owner=None, name=None, cost=None, card_type=None):
         self.name = name
-        self.card_type = None
+        self.card_type = card_type
         self.cost = cost
         self.card_id = None
         self.owner = owner
@@ -32,6 +33,28 @@ class Card(object):
         self.name = 'Card %x' % randrange(10000, 99999)
         self.cost = randrange(0, 7)
 
+    def gui_frame(self, game_field, position):
+        #print "$"*8, game_field, position, self.owner.name
+        off_set_hand = 0
+        if self.owner.name == "Player2":
+            off_set_hand -= 500
+        card_frame = QtGui.QFrame(game_field)
+        card_frame.setGeometry(position[0], position[1] + off_set_hand,
+                                    130, 150)
+        card_frame.setStyleSheet(
+            "border: 1px solid black")
+        card_label = QtGui.QLabel(self.name, game_field)
+        card_label.move(position[0], position[1] + off_set_hand)
+
+        type_label = QtGui.QLabel('Type: %s' % self.card_type, game_field)
+        type_label.move(position[0], position[1] + off_set_hand + 15)
+
+        cost_label = QtGui.QLabel('Cost: %s' % self.cost, game_field)
+        cost_label.move(position[0], position[1] + off_set_hand + 30)
+
+        #self.card_frame.update()
+        #game_field.update()
+
 
 class Character(Card):
     '''
@@ -47,7 +70,9 @@ class Character(Card):
         self.health_value = health
         self.items = []
         self.exposed = None  # When in play, next to a tower or not (bool then)
-        super(Character, self).__init__(owner=owner, name=name, cost=cost)
+        self.card_type = "Character"
+        super(Character, self).__init__(owner=owner, name=name, cost=cost,
+                                        card_type=self.card_type)
 
     def __repr__(self):
         return "<CharacterCard id: %s name:%s cost:%s owner:%s hp:%s/%s \
@@ -152,7 +177,9 @@ class Spell(Card):
 
     def __init__(self, owner=None, name=None, cost=None, target=None):
         self.target = target
-        super(Spell, self).__init__(owner=owner, name=name, cost=cost)
+        self.card_type = "Spell"
+        super(Spell, self).__init__(owner=owner, name=name, cost=cost,
+                                    card_type=self.card_type)
 
 
 class Item(Card):
@@ -164,7 +191,9 @@ class Item(Card):
     def __init__(self, owner=None, name=None, cost=None, buffs=None):
         self.buffs = buffs
         self.equiped_to = None
-        super(Item, self).__init__(owner=owner, name=name, cost=cost)
+        self.card_type = "Item"
+        super(Item, self).__init__(owner=owner, name=name, cost=cost,
+                                   card_type=self.card_type)
 
     def __repr__(self):
         return "<ItemCard id: %s name: %s cost: %s buffs: %s>" % (

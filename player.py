@@ -1,4 +1,5 @@
 from random import randrange
+from PyQt4 import QtGui
 
 from card import Card, Character, Item
 from card import MainDeck, ResourceDeck, UsedDeck, DiscardPile
@@ -7,19 +8,34 @@ MAX_TOWERS = 3
 
 
 class Player(object):
-    def __init__(self, name):
+    def __init__(self, name, game_field):
         self.name = name
         self.hand = []
+        self.game_field = game_field
+
+        self.next_hand_field_position = [20, 550]
 
         main_deck, resource_deck, used_deck, discard_pile = self.start_decks()
         self.main_deck = main_deck
         self.resource_deck = resource_deck
         self.used_deck = used_deck
         self.discard_pile = discard_pile
+        self.gui_labels()
 
     def __repr__(self):
         return "<Player name:%s hand:%s>" % (self.name,
                                              self.hand)
+
+    def gui_labels(self):
+        '''
+        Set up labels for this player on the gui game table
+        '''
+        hand_label = QtGui.QLabel('%s Hand' % self.name,
+                                  self.game_field)
+        label_offset = 0
+        if self.name == 'Player2':
+            label_offset = 500
+        hand_label.move(15, 500 - label_offset)
 
     def start_decks(self):
         '''
@@ -57,6 +73,9 @@ class Player(object):
         Receive a card and add it to a players hand.
         '''
         self.hand.append(card)
+        card.gui_frame(self.game_field,
+                       self.next_hand_field_position)
+        self.next_hand_field_position[0] += 150
 
     def draw_to_hand(self, deck_type='resource'):
         '''
