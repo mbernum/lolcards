@@ -77,7 +77,7 @@ class Player(object):
                        self.next_hand_field_position)
         self.next_hand_field_position[0] += 150
 
-    def draw_to_hand(self, deck_type='resource'):
+    def draw_to_hand(self, deck_type='resource', actions=None):
         '''
         Take a card from a deck and add it to a players hand
         '''
@@ -87,6 +87,7 @@ class Player(object):
             card_gathered = self.resource_deck.cards_in_deck.pop()
 
         self.receive_card(card_gathered)
+        card_gathered.deploy_button.clicked.connect(actions['deploy'])
 
     def randomize_decks(self):
         '''

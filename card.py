@@ -34,26 +34,27 @@ class Card(object):
         self.cost = randrange(0, 7)
 
     def gui_frame(self, game_field, position):
-        #print "$"*8, game_field, position, self.owner.name
         off_set_hand = 0
         if self.owner.name == "Player2":
             off_set_hand -= 500
-        card_frame = QtGui.QFrame(game_field)
-        card_frame.setGeometry(position[0], position[1] + off_set_hand,
+        self.card_frame = QtGui.QFrame(game_field)
+        self.card_frame.setGeometry(position[0], position[1] + off_set_hand,
                                     130, 150)
-        card_frame.setStyleSheet(
+        self.card_frame.setStyleSheet(
             "border: 1px solid black")
-        card_label = QtGui.QLabel(self.name, game_field)
-        card_label.move(position[0], position[1] + off_set_hand)
+        self.card_label = QtGui.QLabel(self.name, game_field)
+        self.card_label.move(position[0], position[1] + off_set_hand)
 
-        type_label = QtGui.QLabel('Type: %s' % self.card_type, game_field)
-        type_label.move(position[0], position[1] + off_set_hand + 15)
+        self.type_label = QtGui.QLabel('Type: %s' % self.card_type, game_field)
+        self.type_label.move(position[0], position[1] + off_set_hand + 15)
 
-        cost_label = QtGui.QLabel('Cost: %s' % self.cost, game_field)
-        cost_label.move(position[0], position[1] + off_set_hand + 30)
+        self.cost_label = QtGui.QLabel('Cost: %s' % self.cost, game_field)
+        self.cost_label.move(position[0], position[1] + off_set_hand + 30)
 
-        #self.card_frame.update()
-        #game_field.update()
+        self.deploy_button = QtGui.QPushButton("Deploy %s" % self.name,
+                                               game_field)
+        self.deploy_button.move(position[0] + 10,
+                                position[1] + off_set_hand + 150)
 
 
 class Character(Card):

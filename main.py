@@ -97,6 +97,7 @@ class TheGame(QtGui.QMainWindow):
 
         self.setCentralWidget(self.game_field)
         self.center_screen()
+        self.statusBar()
 
     def center_screen(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
@@ -152,6 +153,10 @@ class TheGame(QtGui.QMainWindow):
             #exit()
         return action
 
+    def deploy_card(self):
+        sender = self.sender()
+        self.statusBar().showMessage(sender.text())
+
     def main(self):
         '''
         Player creation and game phases. Basic functions of gameplay
@@ -178,6 +183,12 @@ class TheGame(QtGui.QMainWindow):
                 self.end_phase(current_player)
                 enemy_player = current_player
 
+    def player_card_actions(self):
+        '''
+        List of actions the player can do with the card.
+        '''
+        return({'deploy': self.deploy_card})
+
     def start_game(self, players):
         '''
         Deck creation and other starting options needed for players.
@@ -189,7 +200,7 @@ class TheGame(QtGui.QMainWindow):
                 tower.exposed = False
             player.randomize_decks()
             for x in xrange(START_HAND_SIZE):
-                player.draw_to_hand('main')
+                player.draw_to_hand('main', self.player_card_actions())
 
     def opening_phase(self, current_player):
         '''
