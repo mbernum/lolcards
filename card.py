@@ -36,7 +36,7 @@ class Card(object):
     def gui_frame(self, game_field, position):
         off_set_hand = 0
         if self.owner.name == "Player2":
-            off_set_hand -= 500
+            off_set_hand -= 650
         self.card_frame = QtGui.QFrame(game_field)
         self.card_frame.setGeometry(position[0], position[1] + off_set_hand,
                                     130, 150)
@@ -53,7 +53,7 @@ class Card(object):
 
         self.deploy_button = QtGui.QPushButton("Deploy %s" % self.name,
                                                game_field)
-        self.deploy_button.move(position[0] + 10,
+        self.deploy_button.move(position[0],
                                 position[1] + off_set_hand + 150)
 
 

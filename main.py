@@ -8,12 +8,11 @@ from card import Character, Item
 START_HAND_SIZE = 7
 TEST_ROUNDS = 4
 STARTING_RESOURCES = 3
-SCREEN_SIZE = [1200, 750]
+SCREEN_SIZE = [1200, 900]
 
 
 class GameField(QtGui.QFrame):
     def __init__(self):
-        #print "*"*8, self
         self.field = []
         super(GameField, self).__init__()
         self.gui_field()
