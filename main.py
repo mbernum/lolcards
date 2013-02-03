@@ -153,9 +153,24 @@ class TheGame(QtGui.QMainWindow):
             #exit()
         return action
 
-    def deploy_card(self):
+    def deploy_card(self, card):
+        player_off_set = -200
+        if card.owner.name == "Player2":
+            player_off_set = 200
         sender = self.sender()
         self.statusBar().showMessage(sender.text())
+        frame_position = card.card_frame.pos()
+        card_label_position = card.card_label.pos()
+        type_label_position = card.type_label.pos()
+        cost_label_position = card.cost_label.pos()
+        card.card_frame.move(frame_position.x(),
+                             frame_position.y() + player_off_set)
+        card.card_label.move(card_label_position.x(),
+                             card_label_position.y() + player_off_set)
+        card.type_label.move(type_label_position.x(),
+                             type_label_position.y() + player_off_set)
+        card.cost_label.move(cost_label_position.x(),
+                             cost_label_position.y() + player_off_set)
 
     def main(self):
         '''

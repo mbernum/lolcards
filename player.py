@@ -87,7 +87,8 @@ class Player(object):
             card_gathered = self.resource_deck.cards_in_deck.pop()
 
         self.receive_card(card_gathered)
-        card_gathered.deploy_button.clicked.connect(actions['deploy'])
+        card_gathered.deploy_button.clicked.connect(
+            lambda: actions['deploy'](card_gathered))
 
     def randomize_decks(self):
         '''
